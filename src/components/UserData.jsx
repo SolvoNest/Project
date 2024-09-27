@@ -1,34 +1,30 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import '../styles/UserData.css'
+import '../styles/UserData.css';
 
 const UserData = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const url = 'https://chitwanhumad.pythonanywhere.com/get-users';
+  const API_URL = import.meta.env.MODE === 'development' 
+    ? '/get-users'  // Proxy URL in development
+    : 'https://chitwanhumad.pythonanywhere.com/get-users'; // Actual API URL in production
 
   const fetchUsers = async () => {
     setLoading(true);
     setError(null); 
     try {
-      const response = await axios.get('/get-users', {
+      const response = await axios.get(API_URL, {
         headers: {
-        //   "Access-Control-Allow-Headers": "Authorization",
-          "Content-Type": "application/json",
-          "Accept": "application/json",
+          'Content-Type': 'application/json',  // Correct content type for JSON
         },
-        
         auth: {
-          username: import.meta.env.VITE_USER_NAME,
+          username: import.meta.env.VITE_USER_NAME, 
           password: import.meta.env.VITE_PASSWORD, 
         },
       });
 
-      // Log the API response
-      console.log('API Response:', response.data);
-      
       if (response.data.firstname) {
         const formattedData = Object.keys(response.data.firstname).map((key) => ({
           id: key,
@@ -69,9 +65,9 @@ const UserData = () => {
 
   return (
     <div>
-      <button onClick={fetchUsers}>User Data</button>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
+      <button className='btn' onClick={fetchUsers}>Click here to view data</button>
+      {loading && <p className='loading'>Loading...</p>}
+      {error && <p className='error'>Error: {error}</p>}
       
       {users.length > 0 && (
         <table>
@@ -138,4 +134,3 @@ const UserData = () => {
 };
 
 export default UserData;
-
